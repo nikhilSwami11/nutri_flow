@@ -13,6 +13,7 @@ import (
 	"github.com/nikhilswami11/nutriflow/backend/internal/pantry"
 	"github.com/nikhilswami11/nutriflow/backend/internal/profile"
 	"github.com/nikhilswami11/nutriflow/backend/internal/recipes"
+	"github.com/nikhilswami11/nutriflow/backend/internal/sessions"
 	"github.com/nikhilswami11/nutriflow/backend/pkg/db"
 )
 
@@ -23,6 +24,7 @@ func main() {
 	}
 
 	database := db.Connect()
+	redisClient := db.ConnectRedis()
 
 	pantryRepo := pantry.NewRepository(database)
 	pantryHandler := pantry.NewHandler(pantryRepo)
@@ -33,6 +35,10 @@ func main() {
 	recipesRepo := recipes.NewRepository(database)
 	recipesService := recipes.NewService(recipesRepo, pantryRepo, profileRepo)
 	recipesHandler := recipes.NewHandler(recipesService)
+
+	sessionsRepo := sessions.NewRepository(database)
+	sessionsService := sessions.NewService(sessionsRepo, redisClient)
+	sessionsHandler := sessions.NewHandler(sessionsService)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -47,6 +53,13 @@ func main() {
 		r.Post("/", pantryHandler.Create)
 		r.Put("/{id}", pantryHandler.Update)
 		r.Delete("/{id}", pantryHandler.Delete)
+	})
+
+	r.Route("/sessions", func(r chi.Router) {
+		r.Post("/start", sessionsHandler.StartSession)
+		r.Post("/{id}/complete", sessionsHandler.CompleteSession)
+		r.Post("/{id}/abandon", sessionsHandler.AbandonSession)
+		r.Get("/history", sessionsHandler.GetHistory)
 	})
 
 	r.Route("/recipes", func(r chi.Router) {
