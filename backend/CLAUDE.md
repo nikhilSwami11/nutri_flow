@@ -30,13 +30,16 @@ Go REST API using **chi** router with a 3-tier layered architecture per domain:
 
 - `cmd/api/main.go` — entry point: loads env, connects DB, registers routes, starts server
 - `pkg/db/db.go` — MongoDB connection setup (returns `*mongo.Database`)
-- `internal/<domain>/` — each domain has three files:
+- `internal/<domain>/` — each domain has four files:
   - `model.go` — structs with BSON/JSON tags
-  - `repository.go` — all MongoDB operations (10s context timeout pattern)
   - `handler.go` — HTTP handlers wired to chi routes
+  - `service.go` — business logic, cross-domain coordination, external API calls
+  - `repository.go` — all MongoDB operations (10s context timeout pattern)
+
+Request flow: **Handler → Service → Repository → MongoDB**
 
 **Current domains:** `pantry`, `profile`
-**Placeholder domains (empty):** `meals`, `photo`, `sessions`
+**Placeholder domains (empty):** `recipes`, `photo`, `sessions`
 **Placeholder package (empty):** `pkg/ai`
 
 Routes are registered in `main.go`:
@@ -65,7 +68,8 @@ Redis is configured but **not yet used** in application code.
 
 ## Conventions
 
-- MongoDB collections: `pantry_items`, `user_profiles`
+- MongoDB collections: `pantry_items`, `user_profiles`, `recipes`
 - Profile documents use `user_id` as the MongoDB `_id` field
+- Recipe documents use `ObjectID` as `_id`
 - Partial updates in profile use `map[string]interface{}` with `$set`
-- New domains should follow the handler/repository/model pattern in `internal/`
+- New domains go in `internal/` and must include `handler.go`, `service.go`, `repository.go`, and `model.go`
