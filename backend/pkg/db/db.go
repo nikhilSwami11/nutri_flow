@@ -1,28 +1,33 @@
 package db
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"os"
+	"time"
 
-	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Connect() *sql.DB {
-	connStr := os.Getenv("DATABASE_URL")
-	if connStr == "" {
-		log.Fatal("DATABASE_URL environment variable not set")
+func Connect() *mongo.Database {
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		log.Fatal("MONGODB_URI environment variable not set")
 	}
 
-	db, err := sql.Open("postgres", connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		log.Fatal("error opening database: ", err)
+		log.Fatal("error connecting to mongodb: ", err)
 	}
 
-	if err := db.Ping(); err != nil {
-		log.Fatal("error connecting to database: ", err)
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatal("error pinging mongodb: ", err)
 	}
 
-	log.Println("database connected successfully")
-	return db
+	log.Println("mongodb connected successfully")
+	return client.Database("nutriflow_db")
 }

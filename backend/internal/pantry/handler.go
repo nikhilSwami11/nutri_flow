@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Handler struct {
@@ -61,13 +62,19 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, "invalid id format", http.StatusBadRequest)
+		return
+	}
+
 	var item PantryItem
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	item.ID = id
+	item.ID = objectID
 
 	if err := h.repo.Update(&item); err != nil {
 		http.Error(w, "error updating pantry item", http.StatusInternalServerError)
@@ -85,13 +92,19 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, "invalid id format", http.StatusBadRequest)
+		return
+	}
+
 	userID := r.URL.Query().Get("user_id")
 	if userID == "" {
 		http.Error(w, "user_id is required", http.StatusBadRequest)
 		return
 	}
 
-	item := &PantryItem{ID: id, UserID: userID}
+	item := &PantryItem{ID: objectID, UserID: userID}
 	if err := h.repo.Delete(item); err != nil {
 		http.Error(w, "error deleting pantry item", http.StatusInternalServerError)
 		return

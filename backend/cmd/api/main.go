@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/nikhilswami11/nutriflow/backend/internal/pantry"
+	"github.com/nikhilswami11/nutriflow/backend/internal/profile"
 	"github.com/nikhilswami11/nutriflow/backend/pkg/db"
 )
 
@@ -21,10 +22,12 @@ func main() {
 	}
 
 	database := db.Connect()
-	defer database.Close()
 
 	pantryRepo := pantry.NewRepository(database)
 	pantryHandler := pantry.NewHandler(pantryRepo)
+
+	profileRepo := profile.NewRepository(database)
+	profileHandler := profile.NewHandler(profileRepo)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -41,7 +44,15 @@ func main() {
 		r.Delete("/{id}", pantryHandler.Delete)
 	})
 
+	r.Route("/profile", func(r chi.Router) {
+		r.Get("/", profileHandler.Get)
+		r.Post("/", profileHandler.Create)
+		r.Put("/", profileHandler.Update)
+	})
+
 	port := os.Getenv("PORT")
 	log.Println("server starting on port", port)
-	http.ListenAndServe(":"+port, r)
+	if err := http.ListenAndServe(":"+port, r); err != nil {
+		log.Fatal("server error: ", err)
+	}
 }

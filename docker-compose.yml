@@ -1,15 +1,15 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: nutriflow_postgres
+  mongodb:
+    image: mongo:7
+    container_name: nutriflow_mongodb
     environment:
-      POSTGRES_USER: nutriflow
-      POSTGRES_PASSWORD: nutriflow123
-      POSTGRES_DB: nutriflow_db
+      MONGO_INITDB_ROOT_USERNAME: nutriflow
+      MONGO_INITDB_ROOT_PASSWORD: nutriflow123
+      MONGO_INITDB_DATABASE: nutriflow_db
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongodb_data:/data/db
 
   redis:
     image: redis:7
@@ -18,4 +18,4 @@ services:
       - "6379:6379"
 
 volumes:
-  postgres_data:
+  mongodb_data:
