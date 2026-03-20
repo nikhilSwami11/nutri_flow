@@ -12,6 +12,7 @@ import (
 
 	"github.com/nikhilswami11/nutriflow/backend/internal/pantry"
 	"github.com/nikhilswami11/nutriflow/backend/internal/profile"
+	"github.com/nikhilswami11/nutriflow/backend/internal/recipes"
 	"github.com/nikhilswami11/nutriflow/backend/pkg/db"
 )
 
@@ -29,6 +30,10 @@ func main() {
 	profileRepo := profile.NewRepository(database)
 	profileHandler := profile.NewHandler(profileRepo)
 
+	recipesRepo := recipes.NewRepository(database)
+	recipesService := recipes.NewService(recipesRepo, pantryRepo, profileRepo)
+	recipesHandler := recipes.NewHandler(recipesService)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
@@ -42,6 +47,13 @@ func main() {
 		r.Post("/", pantryHandler.Create)
 		r.Put("/{id}", pantryHandler.Update)
 		r.Delete("/{id}", pantryHandler.Delete)
+	})
+
+	r.Route("/recipes", func(r chi.Router) {
+		r.Get("/suggestions", recipesHandler.GetSuggestions)
+		r.Get("/", recipesHandler.GetUserRecipes)
+		r.Post("/", recipesHandler.SaveRecipe)
+		r.Delete("/{id}", recipesHandler.DeleteRecipe)
 	})
 
 	r.Route("/profile", func(r chi.Router) {
