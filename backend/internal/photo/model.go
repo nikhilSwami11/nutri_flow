@@ -17,3 +17,8 @@ type PhotoLog struct {
 	LoggedAt          time.Time          `json:"logged_at" bson:"logged_at"`
 	CreatedAt         time.Time          `json:"created_at" bson:"created_at"`
 }
+
+// TODO: integrate Spoonacular API for food images
+// https://api.spoonacular.com/food/images/classify
+// Add image_url to pantry items when voice adds them
+// Add image_url to recipes when LLM generates them
