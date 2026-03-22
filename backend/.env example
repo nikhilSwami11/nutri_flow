@@ -1,3 +1,8 @@
 MONGODB_URI=mongodb://user:password@localhost:27017/dbname?authSource=admin
 REDIS_URL=redis://localhost:6379
 PORT=8080
+CLOUDFLARE_ACCOUNT_ID=your_account_id
+CLOUDFLARE_R2_ACCESS_KEY=your_access_key
+CLOUDFLARE_R2_SECRET_KEY=your_secret_key
+CLOUDFLARE_R2_BUCKET=nutriflow-photos
+CLOUDFLARE_R2_PUBLIC_URL=https://your_account_id.r2.cloudflarestorage.com

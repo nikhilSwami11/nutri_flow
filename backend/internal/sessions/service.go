@@ -32,6 +32,9 @@ func (s *Service) StartSession(userID string, recipeID string, recipeName string
 		Status:        "created",
 		CurrentTaskID: 0,
 		StartedAt:     time.Now(),
+		// TODO: call Pipeline 2 (steps generation) to populate Steps and CookingTasks
+		Steps:        []Step{},
+		CookingTasks: []CookingTask{},
 	}
 
 	data, err := json.Marshal(session)

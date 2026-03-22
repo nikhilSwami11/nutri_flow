@@ -9,7 +9,9 @@ type Profile struct {
 	Height             float64   `json:"height" bson:"height"`
 	Weight             float64   `json:"weight" bson:"weight"`
 	DailyCalorieGoal   int       `json:"daily_calorie_goal" bson:"daily_calorie_goal"`
-	DietaryPreferences []string  `json:"dietary_preferences" bson:"dietary_preferences"`
+	KitchenType        string    `json:"kitchen_type" bson:"kitchen_type"`
+	CuisinePreferences []string  `json:"cuisine_preferences" bson:"cuisine_preferences"`
+	Allergies          []string  `json:"allergies" bson:"allergies"`
 	CreatedAt          time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at" bson:"updated_at"`
 }

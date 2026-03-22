@@ -12,26 +12,12 @@ type Ingredient struct {
 	Unit     string  `json:"unit" bson:"unit"`
 }
 
-type Step struct {
-	Order       int    `json:"order" bson:"order"`
-	Instruction string `json:"instruction" bson:"instruction"`
-}
-
-type CookingTask struct {
-	ID          int    `json:"id" bson:"id"`
-	Type        string `json:"type" bson:"type"`
-	Instruction string `json:"instruction" bson:"instruction"`
-	Todo        bool   `json:"todo" bson:"todo"`
-}
-
 type Recipe struct {
 	ID           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	UserID       string             `json:"user_id" bson:"user_id"`
 	Name         string             `json:"name" bson:"name"`
 	Description  string             `json:"description" bson:"description"`
 	Ingredients  []Ingredient       `json:"ingredients" bson:"ingredients"`
-	Steps        []Step             `json:"steps" bson:"steps"`
-	CookingTasks []CookingTask      `json:"cooking_tasks" bson:"cooking_tasks"`
 	PrepTime     int                `json:"prep_time" bson:"prep_time"`
 	CookTime     int                `json:"cook_time" bson:"cook_time"`
 	Servings     int                `json:"servings" bson:"servings"`
