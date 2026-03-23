@@ -32,9 +32,8 @@ func (s *Service) StartSession(userID string, recipeID string, recipeName string
 		Status:        "created",
 		CurrentTaskID: 0,
 		StartedAt:     time.Now(),
-		// TODO: call Pipeline 2 (steps generation) to populate Steps and CookingTasks
-		Steps:        []Step{},
-		CookingTasks: []CookingTask{},
+		// TODO: call Pipeline 2 (steps generation) to populate Steps
+		Steps: []Step{},
 	}
 
 	data, err := json.Marshal(session)
@@ -53,47 +52,10 @@ func (s *Service) StartSession(userID string, recipeID string, recipeName string
 	return session, nil
 }
 
-func (s *Service) CompleteSession(sessionID string, servingsEaten float64, caloriesPerServing float64) error {
-	// TODO: trigger pantry depletion based on recipe ingredients
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	key := fmt.Sprintf("session:%s", sessionID)
-	data, err := s.redisClient.Get(ctx, key).Bytes()
-	if err != nil {
-		return err
-	}
-
-	var session Session
-	if err := json.Unmarshal(data, &session); err != nil {
-		return err
-	}
-
-	completed := &CompletedSession{
-		UserID:           session.UserID,
-		RecipeID:         session.RecipeID,
-		RecipeName:       session.RecipeName,
-		ServingsEaten:    servingsEaten,
-		CaloriesConsumed: servingsEaten * caloriesPerServing,
-		StartedAt:        session.StartedAt,
-		CompletedAt:      time.Now(),
-	}
-
-	if err := s.sessionsRepo.Save(completed); err != nil {
-		return err
-	}
-
-	return s.redisClient.Del(ctx, key).Err()
-}
-
 func (s *Service) AbandonSession(sessionID string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	key := fmt.Sprintf("session:%s", sessionID)
 	return s.redisClient.Del(ctx, key).Err()
-}
-
-func (s *Service) GetHistory(userID string) ([]CompletedSession, error) {
-	return s.sessionsRepo.GetByUserID(userID)
 }

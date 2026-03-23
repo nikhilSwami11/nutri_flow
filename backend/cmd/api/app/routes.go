@@ -22,9 +22,7 @@ func (a *App) RegisterRoutes(r *chi.Mux) {
 
 	r.Route("/sessions", func(r chi.Router) {
 		r.Post("/start", a.sessionsHandler.StartSession)
-		r.Post("/{id}/complete", a.sessionsHandler.CompleteSession)
 		r.Post("/{id}/abandon", a.sessionsHandler.AbandonSession)
-		r.Get("/history", a.sessionsHandler.GetHistory)
 	})
 
 	r.Route("/recipes", func(r chi.Router) {

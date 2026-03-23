@@ -42,30 +42,6 @@ func (h *Handler) StartSession(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(session)
 }
 
-func (h *Handler) CompleteSession(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	if id == "" {
-		http.Error(w, "id is required", http.StatusBadRequest)
-		return
-	}
-
-	var body struct {
-		ServingsEaten      float64 `json:"servings_eaten"`
-		CaloriesPerServing float64 `json:"calories_per_serving"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.service.CompleteSession(id, body.ServingsEaten, body.CaloriesPerServing); err != nil {
-		http.Error(w, "error completing session", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
 func (h *Handler) AbandonSession(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -79,21 +55,4 @@ func (h *Handler) AbandonSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *Handler) GetHistory(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		http.Error(w, "user_id is required", http.StatusBadRequest)
-		return
-	}
-
-	history, err := h.service.GetHistory(userID)
-	if err != nil {
-		http.Error(w, "error fetching session history", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(history)
 }
