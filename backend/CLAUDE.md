@@ -73,3 +73,5 @@ Redis is configured but **not yet used** in application code.
 - Recipe documents use `ObjectID` as `_id`
 - Partial updates in profile use `map[string]interface{}` with `$set`
 - New domains go in `internal/` and must include `handler.go`, `service.go`, `repository.go`, and `model.go`
+
+claude --resume 932bf3b1-dd9d-4dd4-8e59-26282becfaa6 
